@@ -125,7 +125,6 @@ export default {
   data() {
     return {
       taskTitle: "",
-      taskId: 3,
       taskDescription: "",
       whatWatch: "Film",
 
@@ -171,7 +170,6 @@ export default {
       }
 
       const task = {
-        id: this.taskId,
         title: this.taskTitle,
         description: this.taskDescription,
         whatWatch: this.whatWatch,
@@ -181,10 +179,9 @@ export default {
         editing: false,
       };
 
-      console.log(task);
+      this.$store.dispatch("newTask", task);
 
       //reset
-      this.taskId += 1;
       this.taskTitle = "";
       this.taskDescription = "";
       this.tagsUsed = [];
