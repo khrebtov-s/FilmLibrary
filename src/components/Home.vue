@@ -52,6 +52,8 @@
               v-model="filmMinutes"
             )
 
+            p {{ filmTime }}
+
           .total-time__serial(
             v-if="whatWatch === 'Serial'"
           )
@@ -70,11 +72,52 @@
               type="number"
               v-model="serialSeriesMinutes"
             )
+
+            p {{ serialTime }}
+
+
+        // Add a new tag 
+        .tag-list.tag-list--addTagUsed  
+          .ui-tag__wrapper(
+            @click="tagMenuShow = !tagMenuShow"
+          )
+            .ui-tag
+              span.tag-title Add new
+              span.button-close(
+                :class="{active: !tagMenuShow}"
+              )
+
+        // Show Input
+        .tag-list--menu.tag-list--input(
+          v-if="tagMenuShow"
+        )
+          input.tag-add--input(
+            type="text"
+            placeholder="New tag"
+            v-model="tagTitle"
+            @keyup.enter="newTag"
+          )
+          .button.button--round.button-primary(
+            @click="newTag"
+          ) Send
+
         .tag-list 
-        .ui-tag__wrapper
-          .ui-tag
-            span.tag-title {{ whatWatch }}
-            span.button-close
+          .ui-tag__wrapper(
+            v-for="tag in tags"
+            :key="tag.title"
+          )
+            .ui-tag(
+              @click="addTagUsed(tag)"
+              :class="{active: tag.use}"
+            )
+              span.tag-title {{ tag.title }}
+              span.button-close
+      
+        .button.button--round.button-primary(
+          @click="newTask"
+        ) Send
+
+      
 </template>
 
 <script>
@@ -91,18 +134,49 @@ export default {
       serialSeason: 1,
       serialSeries: 11,
       serialSeriesMinutes: 40,
+
+      // Tags
+      tagsUsed: [],
+      tags: [
+        { title: "Comedy", use: false },
+        { title: "Westerns", use: false },
+        { title: "Adventure", use: false },
+      ],
+      tagMenuShow: false,
+      tagTitle: "",
     };
   },
   methods: {
+    newTag() {
+      if (this.tagTitle === "") {
+        return;
+      }
+      this.tags.push({
+        title: this.tagTitle,
+        used: false,
+      });
+      // const tag = {
+      //   title: this.tagTitle,
+      // };
+    },
     newTask() {
       if (this.taskTitle === "") {
         return;
       }
+      let time;
+      if (this.whatWatch === "Film") {
+        time = this.filmTime;
+      } else {
+        time = this.serialTime;
+      }
+
       const task = {
         id: this.taskId,
         title: this.taskTitle,
         description: this.taskDescription,
         whatWatch: this.whatWatch,
+        time,
+        tagsUsed: this.tags,
         completed: false,
         editing: false,
       };
@@ -113,6 +187,7 @@ export default {
       this.taskId += 1;
       this.taskTitle = "";
       this.taskDescription = "";
+      this.tagsUsed = [];
     },
 
     getHoursAndMinutes(minutes) {
@@ -120,8 +195,17 @@ export default {
       let min = minutes % 60;
       return hours + " Hours " + min + " Minutes";
     },
+
+    addTagUsed(tag) {
+      tag.use = !tag.use;
+      if (tag.use === true) {
+        this.tagsUsed.push(tag.title);
+      } else {
+        this.tagsUsed.splice(tag.title, 1);
+      }
+    },
   },
-  compudet: {
+  computed: {
     filmTime() {
       let min = this.filmHours * 60 + this.filmMinutes;
       return this.getHoursAndMinutes(min);
@@ -139,7 +223,7 @@ export default {
 .option-list
  display flex
  .what-watch
-   margin-right .5rem
+   margin 0.3rem .5rem 0 0
  label
    margin-right 1.5rem
    &:last-child
@@ -155,4 +239,40 @@ export default {
 .time-input
   max-width 80px
   margin-right 10px
+  margin-left 10px
+
+.tag-list
+  margin-bottom 20px
+
+.ui-tag__wrapper
+  margin-right 18px
+  margin-bottom 10px
+  &:last-child
+    margin-right 0
+
+.ui-tag
+  &.active
+    background-color #444ce0
+    color #fff
+  .button-close
+    &.active
+      transform: rotate(45deg)
+    &.used
+      background-color #444ce0
+      color #fff
+      .button-close
+        &:before,
+        &:after
+          background-color #fff
+
+.tag-list--menu
+  display flex
+  justify-self space-between
+  align-items center
+  margin-bottom 1rem
+
+.tag-add--input
+  margin-bottom 0
+  margin-right 10px
+  height 42px
 </style>
