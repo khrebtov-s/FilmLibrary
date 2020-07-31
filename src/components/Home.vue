@@ -174,7 +174,7 @@ export default {
         description: this.taskDescription,
         whatWatch: this.whatWatch,
         time,
-        tagsUsed: this.tags,
+        tags: this.tags,
         completed: false,
         editing: false,
       };
@@ -184,7 +184,7 @@ export default {
       //reset
       this.taskTitle = "";
       this.taskDescription = "";
-      this.tagsUsed = [];
+      this.tags = [];
     },
 
     getHoursAndMinutes(minutes) {
@@ -196,9 +196,9 @@ export default {
     addTagUsed(tag) {
       tag.use = !tag.use;
       if (tag.use === true) {
-        this.tagsUsed.push(tag.title);
+        this.tags.push({ title: tag.title });
       } else {
-        this.tagsUsed.splice(tag.title, 1);
+        this.tags.splice(tag.title, 1);
       }
     },
   },

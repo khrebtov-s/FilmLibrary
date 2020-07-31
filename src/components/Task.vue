@@ -15,7 +15,7 @@
               .task-item__info
                 .tasl-item__main-info
                   span.ui-label.ui-label--light {{ task.whatWatch }}
-                  span Total Tome:
+                  span Total Tome: {{ task.time }}
                 span.button-close
               .task-item__content
                 .task-item__header
@@ -27,6 +27,17 @@
                   span.ui-titile-3 {{ task.title }}
                 .task-item__body
                   p.ui-text-regular {{ task.description }}
+                .task-item__footer
+                  .tag-list 
+                    .ui-tag__wrapper(
+                      v-for="tag in task.tags"
+                      :key="tag.title"
+                    )
+                      .ui-tag(
+                        class="active"
+                      )
+                        span.tag-title {{ tag.title }}
+                        span.button-close
 </template>
 
 <script>
