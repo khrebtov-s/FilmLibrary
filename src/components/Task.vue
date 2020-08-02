@@ -2,14 +2,25 @@
   .content-wrapper
     section
       .container
-        h1.ui-title-1 Task
+        .task-item__header
+          h1.ui-title-1 Task
+          .buttons-list
+            .button.button--round.button-default(
+              @click="filter = 'active'"
+            ) Active
+            .button.button--round.button-default(
+              @click="filter = 'completed'"
+            ) Completed
+            .button.button--round.button-default(
+              @click="filter = 'all'"
+            ) All
     section
       .container
         .task-list
           .task-item(
-            v-for="task in tasks"
+            v-for="task in tasksFilter"
             :key="task.id"
-            :class="{ completed: task.complited }"
+            :class="{ completed: task.completed }"
           )
             .ui-card.ui-card--shadow
               .task-item__info
@@ -18,7 +29,7 @@
                   span Total Tome: {{ task.time }}
                 span.button-close
               .task-item__content
-                .task-item__header
+                .task-item__title
                   .ui-checkbox-wrapper
                     input.ui-checkbox(
                       type='checkbox'
@@ -42,17 +53,46 @@
 
 <script>
 export default {
+  data() {
+    return {
+      filter: "active",
+    };
+  },
   computed: {
-    tasks() {
-      return this.$store.getters.tasks;
+    tasksFilter() {
+      if (this.filter === "active") {
+        return this.$store.getters.taskNotCompleted;
+      } else if (this.filter === "comleted") {
+        return this.$store.getters.taskCompleted;
+      } else if (this.filter === "all") {
+        return this.$store.getters.tasks;
+      }
+      return this.filter === "active";
     },
   },
 };
 </script>
 
 <style lang="stylus" scoped>
+.task-item__header
+  display flex
+  justify-content space-between
+  align-items center
+  .button
+    margin-right 8px
+  .ui-title-1
+    margin-bottom 0
+
 .task-item
   margin-bottom 20px
+  .ui-checkbox:checked:before
+    border-color #909399
+  &.completed
+    .ui-titile-3,
+    .ui-text-regular,
+    .ui-tag
+      text-decoration line-through
+      color #909399
   &:last-child
     margin-bottom 0
 
@@ -69,7 +109,7 @@ export default {
   width 20px
   height @width
 
-.task-item__header
+.task-item__title
   display flex
   align-items center
   margin-bottom 17px
