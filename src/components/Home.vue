@@ -136,11 +136,6 @@ export default {
 
       // Tags
       tagsUsed: [],
-      tags: [
-        { title: "Comedy", use: false },
-        { title: "Westerns", use: false },
-        { title: "Adventure", use: false },
-      ],
       tagMenuShow: false,
       tagTitle: "",
     };
@@ -150,13 +145,11 @@ export default {
       if (this.tagTitle === "") {
         return;
       }
-      this.tags.push({
+      const tag = {
         title: this.tagTitle,
-        used: false,
-      });
-      // const tag = {
-      //   title: this.tagTitle,
-      // };
+        use: false,
+      };
+      this.$store.dispatch("newTag", tag);
     },
     newTask() {
       if (this.taskTitle === "") {
@@ -174,7 +167,7 @@ export default {
         description: this.taskDescription,
         whatWatch: this.whatWatch,
         time,
-        tags: this.tags,
+        tags: this.tagsUsed,
         completed: false,
         editing: false,
       };
@@ -184,7 +177,11 @@ export default {
       //reset
       this.taskTitle = "";
       this.taskDescription = "";
-      this.tags = [];
+      this.tagsUsed = [];
+
+      for (let i = 0; i < this.tags.length; i++) {
+        this.tags[i].use = false;
+      }
     },
 
     getHoursAndMinutes(minutes) {
@@ -196,13 +193,16 @@ export default {
     addTagUsed(tag) {
       tag.use = !tag.use;
       if (tag.use === true) {
-        this.tags.push({ title: tag.title });
+        this.tagsUsed.push({ title: tag.title });
       } else {
-        this.tags.splice(tag.title, 1);
+        this.tagsUsed.splice(tag.title, 1);
       }
     },
   },
   computed: {
+    tags() {
+      return this.$store.getters.tags;
+    },
     filmTime() {
       let min = this.filmHours * 60 + this.filmMinutes;
       return this.getHoursAndMinutes(min);
