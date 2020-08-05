@@ -42,7 +42,7 @@ export default {
     },
     taskNotCompleted(state) {
       return state.tasks.filter((task) => {
-        return task.completed === false;
+        return !task.completed;
       });
     },
   },
