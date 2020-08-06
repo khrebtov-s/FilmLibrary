@@ -107,9 +107,13 @@ export default {
   display: flex;
 }
 
-.auth__banner, .auth__form {
+.auth__banner, .auth__form
   width: 50%;
-}
+  @media screen and (max-width: 768px)
+    width 100%
+    margin-bottom 30px
+    &:last-child
+      margin-bottom 0
 
 input
   &.error
