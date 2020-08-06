@@ -91,11 +91,11 @@ export default {
           email: this.email,
           password: this.password,
         };
-        console.log(user);
-        this.submitStatus = "PENDING";
-        setTimeout(() => {
-          this.submitStatus = "OK";
-        }, 500);
+        this.$store.dispatch("registerUser", user);
+        // this.submitStatus = "PENDING";
+        // setTimeout(() => {
+        //   this.submitStatus = "OK";
+        // }, 500);
       }
     },
   },
@@ -105,6 +105,7 @@ export default {
 <style lang="stylus" scoped>
 .auth {
   display: flex;
+  flex-wrap wrap
 }
 
 .auth__banner, .auth__form
