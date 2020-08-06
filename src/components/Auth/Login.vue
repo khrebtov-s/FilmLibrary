@@ -41,7 +41,7 @@
 
             .button-list.button-list--info
               span Need an account?
-                router-link(to="/registration")  Sign Up
+                router-link(to="/registration")  SignUp
 
 </template>
 
