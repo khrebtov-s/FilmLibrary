@@ -4,29 +4,25 @@
     .navbar
       .container
         .navbar-content
-          router-link.header-logo(
-            @click="select"
-            to="/"
-          ) Film Library
+          router-link.header-logo(@click="select", to="/") Film Library
           .button-burger(
-            @click="menuShow = !menuShow"
-            :class="{ active: menuShow}"
+            @click="menuShow = !menuShow",
+            :class="{ active: menuShow }"
           )
             span.line.line-1
             span.line.line-2
             span.line.line-3
-          .navbar-list__wrapper(
-            :class="{ active: menuShow}"
-          )
+          .navbar-list__wrapper(:class="{ active: menuShow }")
             ul.navbar-list
               li.navbar-item(
-                v-for="link in linkMenu"
-                :key="link.title"
+                v-for="link in linkMenu",
+                :key="link.title",
                 @click="menuShow = false"
               )
-                router-link.navbar-link(
-                  :to="`${link.url}`"
-                ) {{link.title}}
+                router-link.navbar-link(:to="`${link.url}`") {{ link.title }}
+
+              li.navbar-item(v-if="checkUser", @click="logout")
+                span.navbar-link Log Out
 
   router-view
 </template>
@@ -36,17 +32,29 @@ export default {
   data() {
     return {
       menuShow: false,
-      linkMenu: [
-        { title: "Home", url: "/" },
-        { title: "Task", url: "/task" },
-        { title: "Login", url: "/login" },
-        { title: "Registration", url: "/registration" },
-      ],
     };
   },
   methods: {
-    select: function() {
-      console.log("click"); // returns 'foo'
+    logout() {
+      this.$store.dispatch("logoutUser");
+    },
+  },
+  computed: {
+    checkUser() {
+      return this.$store.getters.checkUser;
+    },
+
+    linkMenu() {
+      if (this.checkUser) {
+        return [
+          { title: "Home", url: "/" },
+          { title: "Task", url: "/task" },
+        ];
+      }
+      return [
+        { title: "Login", url: "/login" },
+        { title: "Registration", url: "/registration" },
+      ];
     },
   },
 };

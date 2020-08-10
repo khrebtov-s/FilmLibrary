@@ -44,6 +44,14 @@ export default {
         throw error;
       }
     },
+    loggedUser({ commit }, payload) {
+      commit("setUser", new User(payload.uid));
+    },
+    logoutUser({ commit }) {
+      firebase.auth().signOut();
+      commit("setUser", null);
+      this.$router.push("/login");
+    },
   },
   getters: {
     user(state) {
