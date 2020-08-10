@@ -10,10 +10,10 @@
           form(@submit.prevent="submit")
             .form-item(:class="{ 'error-input': $v.email.$error }")
               input(
-                type="email", 
-                placeholder="Email", 
-                v-model="email" 
-                :class="{ 'error': $v.email.$error }" 
+                type="email",
+                placeholder="Email",
+                v-model="email",
+                :class="{ error: $v.email.$error }",
                 @change="$v.email.$touch()"
               )
               .error(v-if="!$v.email.required") Field is required
@@ -21,10 +21,10 @@
 
             .form-item(:class="{ 'error-input': $v.password.$error }")
               input(
-                type="password", 
-                placeholder="Password", 
-                v-model="password"
-                :class="{ 'error': $v.password.$error }" 
+                type="password",
+                placeholder="Password",
+                v-model="password",
+                :class="{ error: $v.password.$error }",
                 @change="$v.password.$touch()"
               )
               .error(v-if="!$v.password.required") Password is required.
@@ -35,24 +35,25 @@
               input(
                 type="password",
                 placeholder="Repeat Password",
-                v-model="repeatPassword"
-                :class="{ 'error': $v.repeatPassword.$error }" 
+                v-model="repeatPassword",
+                :class="{ error: $v.repeatPassword.$error }",
                 @change="$v.repeatPassword.$touch()"
               )
               .error(v-if="!$v.repeatPassword.sameAsPassword") Passwords must be identical.
 
             .button-list
-              button.button-primary(type="submit" :disabled="submitStatus === 'PENDING'") SignUp
+              button.button-primary(type="submit") 
+                span(v-if="loading") Loading...
+                span(v-else) SignUp
 
             .button-list.button-list--info
               p.typo__p(v-if="submitStatus === 'OK'") Thanks for your submission!
               p.typo__p(v-if="submitStatus === 'ERROR'") Please fill the form correctly.
-              p.typo__p(v-if="submitStatus === 'PENDING'") Sending...
+              p.typo__p(v-else) {{ submitStatus }}
 
             .button-list.button-list--info
               span Already have an account?
-                router-link(to="/login")  Sign In
-
+                router-link(to="/login") Sign In
 </template>
 
 <script>
@@ -91,12 +92,21 @@ export default {
           email: this.email,
           password: this.password,
         };
-        this.$store.dispatch("registerUser", user);
-        // this.submitStatus = "PENDING";
-        // setTimeout(() => {
-        //   this.submitStatus = "OK";
-        // }, 500);
+        this.$store
+          .dispatch("registerUser", user)
+          .then(() => {
+            this.submitStatus = "OK";
+            this.$router.push("/");
+          })
+          .catch((err) => {
+            this.submitStatus = err.message;
+          });
       }
+    },
+  },
+  computed: {
+    loading() {
+      return this.$store.getters.loading;
     },
   },
 };
@@ -105,40 +115,58 @@ export default {
 <style lang="stylus" scoped>
 .auth {
   display: flex;
-  flex-wrap wrap
+  flex-wrap: wrap;
 }
 
-.auth__banner, .auth__form
+.auth__banner, .auth__form {
   width: 50%;
-  @media screen and (max-width: 768px)
-    width 100%
-    margin-bottom 30px
-    &:last-child
-      margin-bottom 0
 
-input
-  &.error
-    border 1px solid tomato
+  @media screen and (max-width: 768px) {
+    width: 100%;
+    margin-bottom: 30px;
 
-.form-item
-  .error
-    display none
-  &.error-input
-    .error
-      display block
-      color tomato
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+input {
+  &.error {
+    border: 1px solid tomato;
+  }
+}
+
+.form-item {
+  .error {
+    display: none;
+  }
+
+  &.error-input {
+    .error {
+      display: block;
+      color: tomato;
       padding-left: 10px;
       font-size: 14px;
-      margin-bottom 8px
+      margin-bottom: 8px;
+    }
+  }
+}
 
-.button-list
-  text-align right
-  margin-bottom 20px
-  &.buttons-list--info
-    text-align center
-    &:last-child
-      margin-bottom 0
+.button-list {
+  text-align: right;
+  margin-bottom: 20px;
 
-a
-  color #444ce0
+  &.buttons-list--info {
+    text-align: center;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+a {
+  color: #444ce0;
+}
 </style>

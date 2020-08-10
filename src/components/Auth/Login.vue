@@ -10,10 +10,10 @@
           form(@submit.prevent="submit")
             .form-item(:class="{ 'error-input': $v.email.$error }")
               input(
-                type="email", 
-                placeholder="Email", 
-                v-model="email" 
-                :class="{ 'error': $v.email.$error }" 
+                type="email",
+                placeholder="Email",
+                v-model="email",
+                :class="{ error: $v.email.$error }",
                 @change="$v.email.$touch()"
               )
               .error(v-if="!$v.email.required") Field is required
@@ -21,10 +21,10 @@
 
             .form-item(:class="{ 'error-input': $v.password.$error }")
               input(
-                type="password", 
-                placeholder="Password", 
-                v-model="password"
-                :class="{ 'error': $v.password.$error }" 
+                type="password",
+                placeholder="Password",
+                v-model="password",
+                :class="{ error: $v.password.$error }",
                 @change="$v.password.$touch()"
               )
               .error(v-if="!$v.password.required") Password is required.
@@ -32,17 +32,18 @@
                 | Password must have at least {{ $v.password.$params.minLength.min }} letters.
 
             .button-list
-              button.button-primary(type="submit" :disabled="submitStatus === 'PENDING'") Sign In
+              button.button-primary(type="submit") 
+                span(v-if="loading") loading
+                span(v-else) Sign In
 
             .button-list.button-list--info
               p.typo__p(v-if="submitStatus === 'OK'") Thanks for your submission!
               p.typo__p(v-if="submitStatus === 'ERROR'") Please fill the form correctly.
-              p.typo__p(v-if="submitStatus === 'PENDING'") Sending...
+              p.typo__p(v-else) {{ submitStatus }}
 
             .button-list.button-list--info
               span Need an account?
-                router-link(to="/registration")  SignUp
-
+                router-link(to="/registration") SignUp
 </template>
 
 <script>
@@ -78,12 +79,21 @@ export default {
           email: this.email,
           password: this.password,
         };
-        console.log(user);
-        this.submitStatus = "PENDING";
-        setTimeout(() => {
-          this.submitStatus = "OK";
-        }, 500);
+        this.$store
+          .dispatch("loginUser", user)
+          .then(() => {
+            this.submitStatus = "OK";
+            this.$router.push("/");
+          })
+          .catch((err) => {
+            this.submitStatus = err.message;
+          });
       }
+    },
+  },
+  computed: {
+    loading() {
+      return this.$store.getters.loading;
     },
   },
 };
@@ -98,29 +108,42 @@ export default {
   width: 50%;
 }
 
-input
-  &.error
-    border 1px solid tomato
+input {
+  &.error {
+    border: 1px solid tomato;
+  }
+}
 
-.form-item
-  .error
-    display none
-  &.error-input
-    .error
-      display block
-      color tomato
+.form-item {
+  .error {
+    display: none;
+  }
+
+  &.error-input {
+    .error {
+      display: block;
+      color: tomato;
       padding-left: 10px;
       font-size: 14px;
-      margin-bottom 8px
+      margin-bottom: 8px;
+    }
+  }
+}
 
-.button-list
-  text-align right
-  margin-bottom 20px
-  &.buttons-list--info
-    text-align center
-    &:last-child
-      margin-bottom 0
+.button-list {
+  text-align: right;
+  margin-bottom: 20px;
 
-a
-  color #444ce0
+  &.buttons-list--info {
+    text-align: center;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+a {
+  color: #444ce0;
+}
 </style>
